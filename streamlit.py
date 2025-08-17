@@ -74,17 +74,6 @@ ax.set_ylabel("Predicted  Score")
 ax.set_title("Actual vs Predicted")
 st.pyplot(fig)
 
-# Inject custom CSS for background color
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-color: #FFF6E9;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 
 
