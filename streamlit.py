@@ -58,12 +58,6 @@ if st.button('Predict Final Exam Score'):
     st.pyplot(fig)
 
 
-if st.button('Predict Final Exam Score'):
-    predicted_score = model.predict(input_data)[0]
-    st.markdown(f"### Predicted Final Exam Score : {predicted_score:.2f}")
-
-else:
-    st.info("Enter the details and click the button to predict.")
 
 
 y_pred_test = model.predict(X_test)
