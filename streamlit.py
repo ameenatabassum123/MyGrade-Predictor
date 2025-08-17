@@ -43,20 +43,36 @@ input_data = pd.DataFrame({
     'activities': [1 if activities == 'Yes' else 0],
     'G1': [G1],
     'G2': [G2]
-})
+}) 
+
 if st.button('Predict Final Exam Score'):
     predicted_score = model.predict(input_data)[0]
     st.markdown(f"### Predicted Final Exam Score : {predicted_score:.2f}")
 
-    # Plot ONLY the current prediction as a large red dot
-    fig, ax = plt.subplots(figsize=(4,2.5))
-    ax.scatter([1], [predicted_score], color='red', s=100)
-    ax.set_xticks([])  # Hides the x-axis for clarity
-    ax.set_ylabel("Predicted G3 Score")
-    ax.set_title("Your Predicted Exam Score")
-    ax.set_ylim(0, 20)  # Set range to match possible score
-    st.pyplot(fig)
+    # 1. Histogram: Distribution of Final Exam Scores
+    st.markdown("### Distribution of Final Exam Scores")
+    fig1, ax1 = plt.subplots()
+    ax1.hist(df['G3'], bins=20, color='skyblue', edgecolor='black')
+    ax1.set_xlabel("Final Exam Score")
+    ax1.set_ylabel("Number of Students")
+    st.pyplot(fig1)
 
+    # 2. Bar Chart: Average Exam Scores by Activity Participation
+    st.markdown("### Average Exam Scores by Activity Participation")
+    avg_scores = df.groupby('activities')['G3'].mean()
+    fig2, ax2 = plt.subplots()
+    ax2.bar(['No', 'Yes'], avg_scores, color=['orange', 'green'])
+    ax2.set_xlabel("Participation in Activities")
+    ax2.set_ylabel("Average Final Exam Score")
+    st.pyplot(fig2)
+else:
+    st.info("Enter the details and click the button to predict. Graphs will be shown after prediction.")
+
+
+
+if st.button('Predict Final Exam Score'):
+    predicted_score = model.predict(input_data)[0]
+    st.markdown(f"### Predicted Final Exam Score : {predicted_score:.2f}")
 
 
 
