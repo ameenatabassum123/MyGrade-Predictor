@@ -4,8 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_absolute_error
 
-# ----- 1. Set a light peach background -----
+# Inject custom CSS for background color (put this at the very top)
 st.markdown(
     """
     <style>
@@ -17,17 +18,21 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ----- 2. App Title & Description -----
-st.title("MyGrade Predictor")
+############ 1. Title and Banner #############
+st.title("🎓 MyGrade Predictor App")
+st.title("Predicts Student Final Exam Score")
+
+############ 2. Description & Instructions #############
 st.markdown("""
-Welcome!  
-Estimate your final exam score by entering your study details.  
-Click **Predict Final Exam Score** to see your personalized result and insights!
+Welcome! This interactive app predicts a student's final exam score based on their study habits and grades. Made for students to track self progress.
+- Enter details in the sidebar.
+- Click 'Predict Final Exam Score' to view your result and visual insights.
 """)
 
-# ----- 3. Load & Prepare Data -----
+############ 3. Data Loading and Preparation #############
 df = pd.read_csv('student-por.csv')
 df['activities'] = df['activities'].map({'yes': 1, 'no': 0})
+
 features = ['studytime', 'absences', 'activities', 'G1', 'G2']
 X = df[features]
 y = df['G3']
@@ -35,7 +40,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-# ----- 4. Sidebar Inputs -----
+############ 4. Sidebar User Input #############
 st.sidebar.header("Input Student Data")
 studytime = st.sidebar.slider('Study Time (1–4)', 1, 4, 2)
 absences = st.sidebar.slider('Absences', int(df.absences.min()), int(df.absences.max()), 0)
@@ -51,31 +56,48 @@ input_data = pd.DataFrame({
     'G2': [G2]
 })
 
-# ----- 5. Prediction & Visualizations only after button -----
+############ 5. Prediction Button and Responsive Graphs #############
 if st.button('Predict Final Exam Score'):
     predicted_score = model.predict(input_data)[0]
     st.markdown(f"### Predicted Final Exam Score : {predicted_score:.2f}")
 
-    # Histogram of Final Exam Scores
-    st.markdown("#### Distribution of Final Exam Scores")
+    # Grade progression for the entered student
+    st.markdown("#### Your Grade Progression")
     fig1, ax1 = plt.subplots()
-    ax1.hist(df['G3'], bins=20, color='skyblue', edgecolor='black')
-    ax1.set_xlabel("Final Exam Score")
-    ax1.set_ylabel("Number of Students")
+    ax1.plot(['G1', 'G2', 'Predicted G3'], [G1, G2, predicted_score], marker='o', color='blue')
+    ax1.set_ylabel("Score")
+    ax1.set_ylim(0, 20)
     st.pyplot(fig1)
 
-    # Bar Chart: Average Scores by Activity Participation
-    st.markdown("#### Average Scores by Activity Participation")
-    avg_scores = df.groupby('activities')['G3'].mean()
+    # Histogram of final scores with user prediction highlighted
+    st.markdown("#### Distribution of Final Exam Scores (You Highlighted)")
     fig2, ax2 = plt.subplots()
-    ax2.bar(['No', 'Yes'], avg_scores, color=['orange', 'green'])
-    ax2.set_xlabel("Participation in Activities")
-    ax2.set_ylabel("Average Final Exam Score")
+    ax2.hist(df['G3'], bins=20, color='skyblue', edgecolor='black')
+    ax2.axvline(predicted_score, color='red', linestyle='dashed', linewidth=2,
+                label=f'Your Predicted Score ({predicted_score:.2f})')
+    ax2.set_xlabel("Final Exam Score")
+    ax2.set_ylabel("Number of Students")
+    ax2.legend()
     st.pyplot(fig2)
 
-else:
-    st.info("Enter your details and click the button to predict. Graphs will be shown after prediction.")
+    # Model metrics in expander (optional, not per-input)
+    y_pred_test = model.predict(X_test)
+    r2 = r2_score(y_test, y_pred_test)
+    mae = mean_absolute_error(y_test, y_pred_test)
+    with st.expander("Model Evaluation Metrics & Details"):
+        st.write(f"**R² Score:** {r2:.2f}")
+        st.write(f"**Mean Absolute Error:** {mae:.2f}")
+        st.write("Feature Coefficients:")
+        coef_df = pd.DataFrame(model.coef_, features, columns=["Coefficient"])
+        st.dataframe(coef_df)
 
-# ----- 6. Footer -----
+    # Optional: Data sample
+    if st.checkbox("Show Sample Data Table"):
+        st.dataframe(df.head())
+
+else:
+    st.info("Enter the details and click the button to predict. Graphs will appear after prediction.")
+
+############ 9. Footer #############
 st.markdown("---")
-st.markdown("Made by [Your Name] • For students and learning!")
+st.markdown("Made by [Ameena Tabassum]. Contact: ameenatabassum1664@gmail.com")
