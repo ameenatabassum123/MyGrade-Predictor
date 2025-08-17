@@ -1,4 +1,4 @@
-# SmartGrade Predictor
+# MyGrade Predictor
 
 > Predict final exam scores for students using machine learning and interactive inputs — powered by Streamlit!
 
