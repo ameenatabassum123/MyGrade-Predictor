@@ -44,6 +44,18 @@ input_data = pd.DataFrame({
     'G1': [G1],
     'G2': [G2]
 })
+if st.button('Predict Final Exam Score'):
+    predicted_score = model.predict(input_data)[0]
+    st.markdown(f"### Predicted Final Exam Score : {predicted_score:.2f}")
+
+    # Plot ONLY the current prediction as a large red dot
+    fig, ax = plt.subplots(figsize=(4,2.5))
+    ax.scatter([1], [predicted_score], color='red', s=100)
+    ax.set_xticks([])  # Hides the x-axis for clarity
+    ax.set_ylabel("Predicted G3 Score")
+    ax.set_title("Your Predicted Exam Score")
+    ax.set_ylim(0, 20)  # Set range to match possible score
+    st.pyplot(fig)
 
 
 if st.button('Predict Final Exam Score'):
